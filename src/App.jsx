@@ -1,35 +1,52 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from "react";
+import "./App.css";
 
-function App() {
-  const [count, setCount] = useState(0)
+import Descriptions from "./Components/Descriptions";
+import Options from "./Components/Options";
+import Feedback from "./Components/Feedback";
+import Notification from "./Components/Notification";
+
+//
+
+const App = () => {
+  const [voiceCount, setVoiceCount] = useState({ good: 0, neutral: 0, bad: 0 });
+
+  const totalFeedback = voiceCount.good + voiceCount.neutral + voiceCount.bad;
+
+  const positiveRate = Math.round(
+    ((voiceCount.good + voiceCount.neutral) / totalFeedback) * 100
+  );
+
+  const updateFeedback = (feedbackType) => {
+    setVoiceCount({
+      ...voiceCount,
+      [feedbackType]: voiceCount[feedbackType] + 1,
+    });
+  };
+
+  const resetFeedback = (totalFeedback) => {
+    setVoiceCount({ good: 0, neutral: 0, bad: 0 });
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <div>
+      <Descriptions />
+      <Options
+        updateFeedback={updateFeedback}
+        totalFeedback={totalFeedback}
+        resetFeedback={resetFeedback}
+      />
+      {totalFeedback === 0 ? (
+        <Notification />
+      ) : (
+        <Feedback
+          voice={voiceCount}
+          totalFeedback={totalFeedback}
+          positiveRate={positiveRate}
+        />
+      )}
+    </div>
+  );
+};
 
-export default App
+export default App;
