@@ -1,15 +1,20 @@
 import { useState } from "react";
 import "./App.css";
 
-import Descriptions from "./Components/Descriptions";
-import Options from "./Components/Options";
-import Feedback from "./Components/Feedback";
-import Notification from "./Components/Notification";
+import Descriptions from "./Components/Descriptions/Descriptions";
+import Options from "./Components/Options/Options";
+import Feedback from "./Components/Feedback/Feedback";
+import Notification from "./Components/Notification/Notification";
+import { useEffect } from "react";
 
-//
+const noVoiceArr = { good: 0, neutral: 0, bad: 0 };
 
 const App = () => {
-  const [voiceCount, setVoiceCount] = useState({ good: 0, neutral: 0, bad: 0 });
+  const [voiceCount, setVoiceCount] = useState(() => {
+    const voiceCountLS = window.localStorage.getItem("saved-voice");
+    const voiceCountParse = JSON.parse(voiceCountLS) ?? noVoiceArr;
+    return voiceCountParse;
+  });
 
   const totalFeedback = voiceCount.good + voiceCount.neutral + voiceCount.bad;
 
@@ -24,12 +29,17 @@ const App = () => {
     });
   };
 
-  const resetFeedback = (totalFeedback) => {
-    setVoiceCount({ good: 0, neutral: 0, bad: 0 });
+  const resetFeedback = () => {
+    setVoiceCount(noVoiceArr);
   };
 
+  useEffect(() => {
+    const voiceCountJson = JSON.stringify(voiceCount);
+    window.localStorage.setItem("saved-voice", voiceCountJson);
+  }, [voiceCount]);
+
   return (
-    <div>
+    <div className="container">
       <Descriptions />
       <Options
         updateFeedback={updateFeedback}
